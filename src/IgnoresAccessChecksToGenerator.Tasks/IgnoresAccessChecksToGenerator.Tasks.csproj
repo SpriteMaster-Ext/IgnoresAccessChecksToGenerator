@@ -1,25 +1,56 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
-    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <NuspecFile>IgnoresAccessChecksToGenerator.nuspec</NuspecFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+		<NuspecFile>IgnoresAccessChecksToGenerator.nuspec</NuspecFile>
+		<LangVersion>preview</LangVersion>
+		<Nullable>enable</Nullable>
+		<GenerateDependencyFile>true</GenerateDependencyFile>
+		<AssemblyVersion>0.5.1.0</AssemblyVersion>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>IgnoresAccessChecksToGenerator</Title>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisLevel>preview-all</AnalysisLevel>
+		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageOutputPath>D:\NuGet</PackageOutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.11.3" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.1.1012" />
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+	  <None Include="..\..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
-  <Target Name="CopyRefsTarget" AfterTargets="AfterBuild">
-    <ItemGroup>
-      <CopyRefs Include="@(ReferencePath)" Condition=" '%(Filename)' == 'Mono.Cecil' " />
-    </ItemGroup>
-    <Copy SourceFiles="@(CopyRefs)" DestinationFolder="$(OutDir)" />
-  </Target>
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Diagnostics" Version="8.0.0" />
+		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" rivateAssets="all" ExcludeAssets="Runtime" />
+		<PackageReference Include="Mono.Cecil" Version="0.11.4" />
+		<PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.2.0" PrivateAssets="all" ExcludeAssets="Runtime" />
+		<PackageReference Include="Nullable" Version="1.3.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<Target Name="CopyRefsTarget" AfterTargets="AfterBuild">
+		<ItemGroup>
+			<CopyRefs Include="@(ReferencePath)" Condition=" '%(Filename)' == 'Mono.Cecil' " />
+		</ItemGroup>
+		<Copy SourceFiles="@(CopyRefs)" DestinationFolder="$(OutDir)" />
+	</Target>
+	
+	<Target Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput" BeforeTargets="BuiltProjectOutputGroup" Condition=" '$(GenerateDependencyFile)' == 'true'">
+
+	 <ItemGroup>
+		<BuiltProjectOutputGroupOutput Include="$(ProjectDepsFilePath)" TargetPath="$(ProjectDepsFileName)" FinalOutputPath="$(ProjectDepsFilePath)" />
+	</ItemGroup>
+</Target>
+	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="copy $(OutDir)" />
+	</Target>
 
 </Project>
